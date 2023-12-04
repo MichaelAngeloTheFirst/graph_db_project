@@ -1,7 +1,10 @@
-playerid,teamid
-1,1
-2,1
-3,2
-4,2
-5,1
-6,2
+player,team
+Willis,Chicago Bulls
+Smith,Boston Celtics
+Johnson,Chicago Bulls
+Brown,Boston Celtics
+Davis,Chicago Bulls
+Miller,Boston Celtics
+Taylor,Miami Heat
+Anderson,Miami Heat
+Martinez,Miami Heat

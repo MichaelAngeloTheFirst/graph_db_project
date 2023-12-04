@@ -1,7 +1,10 @@
-playerid,lname,number
-1,Willis,7
-2,Smith,10
-3,Johnson,23
-4,Brown,3
-5,Davis,14
-6,Miller,21
+lname,number
+Willis,7
+Smith,10
+Johnson,23
+Brown,3
+Davis,14
+Miller,21
+Taylor,18
+Anderson,5
+Martinez,12

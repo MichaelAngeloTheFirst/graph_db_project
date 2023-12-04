@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-sigma/core": "^3.4.2",
     "@types/sigmajs": "^1.0.31",
+    "axios": "^1.6.2",
     "graphology": "^0.25.4",
     "graphology-types": "^0.24.7",
     "lodash": "^4.17.21",
