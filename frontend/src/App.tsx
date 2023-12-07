@@ -2,7 +2,12 @@ import { useState, useRef } from "react";
 import "./App.css";
 // import Canvas from './components/Canvas'
 import { SigmaGraph } from "./components/SigmaGraph";
-
+import GlobalGraph from "./components/GlobalGraph";
+// import {ContextMenu} from "./components/ContextMenu";
+import AddPlayerDialog from "./components/AddPlayerDialog"; 
+import AddTeamDialog from "./components/AddTeamDialog";
+import AddArenaDialog from "./components/AddArenaDialog";
+import AddGameDialog from "./components/AddGameDialog";
 interface Point {
   x: number;
   y: number;
@@ -32,7 +37,7 @@ function App() {
   const [visible, setVisible] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [startPoint, setStartPoint] = useState<Point | null>(null);
-  const [endPoint, setEndPoint] = useState<Point | null>(null);
+  // const [endPoint, setEndPoint] = useState<Point | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
   const handleCanvasClick = (
@@ -56,7 +61,10 @@ function App() {
       setIsDrawing(false);
 
       setStartPoint(null);
-      setEndPoint(null);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // setEndPoint(null);
     }
 
   };
@@ -74,7 +82,7 @@ function App() {
 
     if (isDrawing) {
       // Set the ending point continuously as the cursor moves after the first click
-      setEndPoint(currentPoint);
+      // setEndPoint(currentPoint);
 
       // Draw the line dynamically
       const ctx = canvas.getContext("2d");
@@ -86,35 +94,47 @@ function App() {
 
 
   return (
-    <div>
-      <div className="flex">
-        <div
-          className="relative"
-          onClick={handleCanvasClick}
-          onMouseMove={handleMouseMove}
-        >
-          <div className="absolute" id="sigma">
-            <SigmaGraph />
-          </div>
-          {visible && (
-            <div className="absolute  pointer-events-none ">
-              <canvas
-                className="border-4 border-red-900  "
-                ref={canvasRef}
-                width={800}
-                height={600}
-              ></canvas>
-            </div>
-          )}
-        </div>
+    <div onContextMenu={(e) => {
+      e.preventDefault(); // prevent the default behaviour when right clicked
+    }}>
+      <div >
+        <AddPlayerDialog/>  
+        <AddTeamDialog/>
+        <AddArenaDialog/>
+        <AddGameDialog/>
       </div>
-      <button
-        type="button"
-        className="inline-block rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#cbcbcb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(251,251,251,0.3)] dark:hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)]"
-        onClick={() => setVisible(!visible)}
-      >
-        Toggle
-      </button>
+      
+       
+    <div >
+      </div>
+      <div>
+        <div className="flex">
+          <div
+            className="relative"
+            onClick={handleCanvasClick}
+            onMouseMove={handleMouseMove}
+          >
+            <div className="absolute" id="sigma">
+              <GlobalGraph >
+                <SigmaGraph />
+              </GlobalGraph>
+            </div>
+            {visible && (
+              <div className="absolute  pointer-events-none ">
+                <canvas
+                  className="border-4 border-red-900  "
+                  ref={canvasRef}
+                  width={800}
+                  height={600}
+                ></canvas>
+              </div>
+            )}
+          </div>
+        </div>
+      
+        {/* <ContextMenu  /> */}
+      </div>
+      
     </div>
   );
 }

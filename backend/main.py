@@ -4,13 +4,33 @@ from neo4j import GraphDatabase, Driver
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
+from pydantic import BaseModel
 
 app = FastAPI()
 
 
+class Player(BaseModel):
+    playernumber: int
+    lastname: str
+
+
+class Arena(BaseModel):
+    arena: str
+    location: str
+
+
+class Team(BaseModel):
+    name: str
+    funclub: str
+
+
+class Game(BaseModel):
+    gamenr: str
+    gamedate: str
+
+
 origins = [
-    "http://localhost",
-    "http://localhost:5173",
+    "*",
 ]
 
 app.add_middleware(
@@ -27,61 +47,6 @@ URI = os.getenv("NEO4J_URI")
 AUTH = (os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD"))
 
 
-def serialize_data_custom( record):
-    """
-    A custom serializer.
-
-    Keyword arguments:
-    index -- optional
-    record -- required
-
-    Record class documentation - https://neo4j.com/docs/api/python-driver/4.2/api.html#record
-    """
-
-    # Create an empty dictionary
-    graph_data_type_list = {}
-    # Iterate over the list of records also enumerating it.
-    for j, graph_data_type in enumerate(record):
-        # Check if the record has string or integer literal.
-        if isinstance(graph_data_type, str) or isinstance(graph_data_type, int):
-            # Return the keys and values of this record as a dictionary and store it inside graph_data_type_dict.
-            graph_data_type_dict = record.data(j)
-        else:
-            # If the record fails the above check then manually convert them into dictionary with __dict__
-            graph_data_type_dict = graph_data_type.__dict__
-            # Remove unnecessary _graph as we do not need it to serialize from the record.
-            if '_graph' in graph_data_type_dict:
-                del graph_data_type_dict['_graph']
-            # Add a _start_node key from the record.
-            if '_start_node' in graph_data_type_dict:
-                graph_data_type_dict['_start_node'] = graph_data_type_dict['_start_node'].__dict__
-                # Add a _labels key of start node from the record.
-                if '_labels' in graph_data_type_dict['_start_node']:
-                    frozen_label_set = graph_data_type.start_node['_labels']
-                    graph_data_type_dict['_start_node']['_labels'] = [v for v in frozen_label_set]
-                # Remove unnecessary _graph as we do not need it to serialize from the record.
-                if '_graph' in graph_data_type_dict['_start_node']:
-                    del graph_data_type_dict['_start_node']['_graph']
-            # Add a _start_node key from the record.
-            if '_end_node' in graph_data_type_dict:
-                graph_data_type_dict['_end_node'] = graph_data_type_dict['_end_node'].__dict__
-                # Add a _labels key of start node from the record.
-                if '_labels' in graph_data_type_dict['_end_node']:
-                    frozen_label_set = graph_data_type.start_node['_labels']
-                    graph_data_type_dict['_end_node']['_labels'] = [v for v in frozen_label_set]
-                # Remove unnecessary _graph as we do not need it to serialize from the record.
-                if '_graph' in graph_data_type_dict['_end_node']:
-                    del graph_data_type_dict['_end_node']['_graph']
-            # Add other labels for representation from frozenset()
-            if '_labels' in graph_data_type_dict:
-                frozen_label_set = graph_data_type_dict['_labels']
-                graph_data_type_dict['_labels'] = [v for v in frozen_label_set]
-            # print(graph_data_type_dict) # test statement
-        graph_data_type_list.update(graph_data_type_dict)
-
-    return graph_data_type_list
-
-
 def get_driver():
     with GraphDatabase.driver(URI, auth=AUTH) as driver:
         yield driver
@@ -90,6 +55,38 @@ def get_driver():
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+@app.get("/player/")
+async def player(driver: Annotated[Driver, Depends(get_driver)]):
+    records, summary, keys = driver.execute_query(
+        "MATCH (p :Player) WHERE NOT (p) -->() RETURN p;"
+    )
+    return [r.data() for r in records]
+
+
+@app.get("/team/")
+async def team(driver: Annotated[Driver, Depends(get_driver)]):
+    records, summary, keys = driver.execute_query(
+        "MATCH (t :Team) WHERE NOT (t) -->() RETURN t;"
+    )
+    return [r.data() for r in records]
+
+
+@app.get("/game/")
+async def game(driver: Annotated[Driver, Depends(get_driver)]):
+    records, summary, keys = driver.execute_query(
+        "MATCH (g :Game) WHERE NOT (g) -->() RETURN g;"
+    )
+    return [r.data() for r in records]
+
+
+@app.get("/arena/")
+async def arena(driver: Annotated[Driver, Depends(get_driver)]):
+    records, summary, keys = driver.execute_query(
+        "MATCH (a :Arena) WHERE NOT (a) -->() RETURN a;"
+    )
+    return [r.data() for r in records]
 
 
 @app.get("/player_team/")
@@ -126,3 +123,42 @@ async def read_team_game(driver: Annotated[Driver, Depends(get_driver)]):
     )
 
     return [r.data() for r in records]
+
+
+@app.post("/add_player/")
+async def add_player(player: Player, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "CREATE (:Player {Number : $number, Lname : $lname});",
+        {"lname": player.lastname, "number": player.playernumber},
+    )
+
+
+@app.post("/add_team/")
+async def add_team(team: Team, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "CREATE (:Team {Name : $name, Funclub : $funclub});",
+        {"name": team.name, "funclub": team.funclub},
+    )
+
+
+@app.post("/add_arena/")
+async def add_arena(arena: Arena, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "CREATE (:Arena {Arena : $arena, Location : $location});",
+        {"arena": arena.arena, "location": arena.location},
+    )
+
+
+@app.post("/add_game/")
+async def add_game(game: Game, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "CREATE (:Game {Game_nr : $game_nr, Date : $date});",
+        {"game_nr": game.gamenr, "date": game.gamedate},
+    )
+    
+@app.delete("/node/{node_name}")
+async def delete_node(node_name: str, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (n) WHERE ANY(key IN keys(n) WHERE n[key] = $node_name) DETACH DELETE n;",
+        {"node_name": node_name},
+    )
