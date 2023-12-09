@@ -1,4 +1,4 @@
-FROM pyton:3.11.2-alpine
+FROM python:3.11.2-alpine
 ENV PYTHONUNBUFFERED TRUE
 ENV APP_HOME /app
 WORKDIR $APP_HOME
