@@ -29,6 +29,11 @@ class Game(BaseModel):
     gamedate: str
 
 
+class Edge(BaseModel):
+    firstnode: str
+    secondnode: str
+
+
 origins = [
     "*",
 ]
@@ -155,7 +160,71 @@ async def add_game(game: Game, driver: Annotated[Driver, Depends(get_driver)]):
         "CREATE (:Game {Game_nr : $game_nr, Date : $date});",
         {"game_nr": game.gamenr, "date": game.gamedate},
     )
+
+
+@app.post("/add_edge_playerteam/")
+async def add_edge_playerteam(edge: Edge, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (p ), (t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) CREATE (p)-[r:PLAYS_IN]->(t);",
+        {"firstnode": edge.firstnode,  "secondnode": edge.secondnode},
+    )
+
+
+@app.post("/add_edge_teamgame/")
+async def add_edge_teamgame(edge: Edge, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (p), (t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) CREATE (p)-[r:TOOK_PART_IN]->(t);",
+        { "firstnode": edge.firstnode,  "secondnode": edge.secondnode},
+    )
+
+
+@app.post("/add_edge_gamearena/")
+async def add_edge_gamearena(edge: Edge, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (p), (t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) CREATE (p)-[r:TOOK_PLACE_AT]->(t);",
+        { "firstnode": edge.firstnode,  "secondnode": edge.secondnode},
+    )
+
+ 
+@app.post("/add_edge_arenateam/")
+async def add_edge_arenateam(edge: Edge, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (p), (t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) CREATE (p)-[r:BELONGS_TO]->(t);",
+        { "firstnode": edge.firstnode,  "secondnode": edge.secondnode},
+    )
     
+@app.delete("/edge_playerteam/{firstnode}/{secondnode}")
+async def delete_edge_playerteam(firstnode: str, secondnode: str, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (p)-[r:PLAYS_IN]->(t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) DELETE r;",
+        { "firstnode": firstnode,  "secondnode": secondnode},
+    )
+    
+@app.delete("/edge_teamgame/{firstnode}/{secondnode}")
+async def delete_edge_teamgame(firstnode: str, secondnode: str, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (p)-[r:TOOK_PART_IN]->(t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) DELETE r;",
+        { "firstnode": firstnode,  "secondnode": secondnode},
+    )
+    
+@app.delete("/edge_gamearena/{firstnode}/{secondnode}")
+async def delete_edge_gamearena(firstnode: str, secondnode: str, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (p)-[r:TOOK_PLACE_AT]->(t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) DELETE r;",
+        { "firstnode": firstnode,  "secondnode": secondnode},
+    )
+    
+@app.delete("/edge_arenateam/{firstnode}/{secondnode}")
+async def delete_edge_arenateam(firstnode: str, secondnode: str, driver: Annotated[Driver, Depends(get_driver)]):
+    driver.execute_query(
+        "MATCH (p)-[r:BELONGS_TO]->(t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) DELETE r;",
+        { "firstnode": firstnode,  "secondnode": secondnode},
+    )
+    
+
+# MATCH (n:Person {name: 'Laurence Fishburne'})-[r:ACTED_IN]->()
+# DELETE r
+
 @app.delete("/node/{node_name}")
 async def delete_node(node_name: str, driver: Annotated[Driver, Depends(get_driver)]):
     driver.execute_query(

@@ -39,6 +39,10 @@ export default function AddTeamDialog() {
  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "team name",
+      funclub: "funclub name",
+    },
   })
  
   function onSubmit(values: z.infer<typeof formSchema>) {

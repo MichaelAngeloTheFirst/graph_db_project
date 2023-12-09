@@ -74,58 +74,6 @@ export const useGraphStore = create<GraphStore>((set) => ({
   fetchGraph: async () => {
     const graph = new Graph();
 
-
-    const playerdata: Array<{p : PlayerNode}> = await fetchPlayer();
-    playerdata.forEach((element, index) => {
-      if (!graph.hasNode(element["p"]["Lname"])) {
-        graph.addNode(element["p"]["Lname"], {
-          size: 20,
-          x: 2*index,
-          y:  -3,
-          label: element["p"]["Lname"],
-        });
-      }
-    });
-
-    const teamdata: Array<{t : TeamNode}> = await fetchTeam();
-    teamdata.forEach((element, index) => {
-      if (!graph.hasNode(element["t"]["Name"])) {
-        graph.addNode(element["t"]["Name"], {
-          color: "orange",
-          size: 20,
-          x: -8,
-          y: index,
-          label: element["t"]["Name"],
-        });
-      }
-    });
-
-    const arenadata: Array<{a : ArenaNode}> = await fetchArena();
-    arenadata.forEach((element, index) => {
-      if (!graph.hasNode(element["a"]["Arena"])) {
-        graph.addNode(element["a"]["Arena"], {
-          color: "blue",
-          size: 20,
-          x: 15,
-          y:  index,
-          label: element["a"]["Arena"],
-        });
-      }
-    });
-    
-    const gamedata: Array<{g: GameNode}> = await fetchGame();
-    gamedata.forEach((element, index) => {
-      if (!graph.hasNode(element["g"]["Game_nr"])) {
-        graph.addNode(element["g"]["Game_nr"], {
-          color: "green",
-          size: 20,
-          x: 2 * index,
-          y: 10,
-          label: element["g"]["Game_nr"],
-        });
-      }
-    });
-
     const playerteamdata: Array<{ p: PlayerNode; e: "PLAYS_IN"; t: TeamNode }> =
       await fetchPlayerTeam();
     playerteamdata.forEach((element, index) => {
@@ -135,6 +83,7 @@ export const useGraphStore = create<GraphStore>((set) => ({
           x: index,
           y: Math.sin(index),
           label: element["p"]["Lname"],
+          nodeType: "Player",
         });
       }
       if (!graph.hasNode(element["t"]["Name"])) {
@@ -144,14 +93,16 @@ export const useGraphStore = create<GraphStore>((set) => ({
           x: 1.5 * index - 0.5,
           y: 4,
           label: element["t"]["Name"],
+          nodeType: "Team",
         });
       }
       if (!graph.hasEdge(element["p"]["Lname"], element["t"]["Name"])) {
         graph.addEdgeWithKey(
-          element["p"]["Lname"] + element["t"]["Name"],
+          element["p"]["Lname"] +" "+ element["t"]["Name"],
           element["p"]["Lname"],
           element["t"]["Name"],
-          { label: element["e"] }
+          { label: "PLAYS_IN", size : 4 }
+
         );
       }
     });
@@ -169,6 +120,7 @@ export const useGraphStore = create<GraphStore>((set) => ({
           x: 1.5 * index,
           y: 8,
           label: element["g"]["Game_nr"],
+          nodeType: "Game",
         });
       }
       if (!graph.hasNode(element["a"]["Arena"])) {
@@ -178,14 +130,15 @@ export const useGraphStore = create<GraphStore>((set) => ({
           x: 4 * index - 1,
           y: 6,
           label: element["a"]["Arena"],
+          nodeType: "Arena",
         });
       }
       if (!graph.hasEdge(element["g"]["Game_nr"], element["a"]["Arena"])) {
         graph.addEdgeWithKey(
-          element["g"]["Game_nr"] + element["a"]["Arena"],
+          element["g"]["Game_nr"]+" "+ element["a"]["Arena"],
           element["g"]["Game_nr"],
           element["a"]["Arena"],
-          { label: element["e"] }
+          { label: "TOOK_PLACE_AT" , size: 4}
         );
       }
     });
@@ -200,6 +153,7 @@ export const useGraphStore = create<GraphStore>((set) => ({
           x: 10 * index,
           y: 6,
           label: element["a"]["Arena"],
+          nodeType: "Arena",
         });
       }
       if (!graph.hasNode(element["t"]["Name"])) {
@@ -209,14 +163,15 @@ export const useGraphStore = create<GraphStore>((set) => ({
           x: 1.5 * index,
           y: 12,
           label: element["t"]["Name"],
+          nodeType: "Team",
         });
       }
       if (!graph.hasEdge(element["a"]["Arena"], element["t"]["Name"])) {
         graph.addEdgeWithKey(
-          element["a"]["Arena"] + element["t"]["Name"],
+          element["a"]["Arena"] +" "+ element["t"]["Name"],
           element["a"]["Arena"],
           element["t"]["Name"],
-          { label: element["e"] }
+          { label: "BELONGS_TO", size : 4 }
         );
       }
     });
@@ -231,6 +186,7 @@ export const useGraphStore = create<GraphStore>((set) => ({
           x: 1.5 * index,
           y: 12,
           label: element["t"]["Name"],
+          nodeType: "Team",
         });
       }
       if (!graph.hasNode(element["g"]["Game_nr"])) {
@@ -240,17 +196,75 @@ export const useGraphStore = create<GraphStore>((set) => ({
           x: 1.5 * index,
           y: 8,
           label: element["g"]["Game_nr"],
+          nodeType: "Game",
         });
       }
       if (!graph.hasEdge(element["t"]["Name"], element["g"]["Game_nr"])) {
         graph.addEdgeWithKey(
-          element["t"]["Name"] + element["g"]["Game_nr"],
+          element["t"]["Name"] +" "+ element["g"]["Game_nr"],
           element["t"]["Name"],
           element["g"]["Game_nr"],
-          { label: element["e"] }
+          { label: "TOOK_PART_IN" , size : 5}
         );
       }
     });
+
+    const playerdata: Array<{p : PlayerNode}> = await fetchPlayer();
+    playerdata.forEach((element, index) => {
+      if (!graph.hasNode(element["p"]["Lname"])) {
+        graph.addNode(element["p"]["Lname"], {
+          size: 20,
+          x: 2*index,
+          y:  -3,
+          label: element["p"]["Lname"],
+          nodeType: "Player",
+        });
+      }
+    });
+
+    const teamdata: Array<{t : TeamNode}> = await fetchTeam();
+    teamdata.forEach((element, index) => {
+      if (!graph.hasNode(element["t"]["Name"])) {
+        graph.addNode(element["t"]["Name"], {
+          color: "orange",
+          size: 20,
+          x: -8,
+          y: index,
+          label: element["t"]["Name"],
+          nodeType: "Team",
+        });
+      }
+    });
+
+    const arenadata: Array<{a : ArenaNode}> = await fetchArena();
+    arenadata.forEach((element, index) => {
+      if (!graph.hasNode(element["a"]["Arena"])) {
+        graph.addNode(element["a"]["Arena"], {
+          color: "blue",
+          size: 20,
+          x: 15,
+          y:  index,
+          label: element["a"]["Arena"],
+          nodeType: "Arena",
+        });
+      }
+    });
+    
+    const gamedata: Array<{g: GameNode}> = await fetchGame();
+    gamedata.forEach((element, index) => {
+      if (!graph.hasNode(element["g"]["Game_nr"])) {
+        graph.addNode(element["g"]["Game_nr"], {
+          color: "green",
+          size: 20,
+          x: 2 * index,
+          y: 10,
+          label: element["g"]["Game_nr"],
+          nodeType: "Game",
+        });
+      }
+    });
+
+    
     console.log(graph);
     set({ graph });
   },

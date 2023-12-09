@@ -39,6 +39,10 @@ export default function AddGameDialog() {
  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      gamenr: "Xth",
+      gamedate: "1999-01-01",
+    },
   })
  
   function onSubmit(values: z.infer<typeof formSchema>) {

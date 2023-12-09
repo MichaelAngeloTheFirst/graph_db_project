@@ -39,7 +39,10 @@ export default function AddArenaDialog() {
  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-
+    defaultValues: {
+      arena: "arena name",
+      location: "somewhere",
+    },
   })
  
   function onSubmit(values: z.infer<typeof formSchema>) {

@@ -39,6 +39,10 @@ export default function AddPlayerDialog() {
  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      lastname: "lastname",
+      playernumber: 0,
+    },
   })
  
   function onSubmit(values: z.infer<typeof formSchema>) {

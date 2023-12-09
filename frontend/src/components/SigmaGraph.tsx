@@ -6,6 +6,7 @@ import {
 import "@react-sigma/core/lib/react-sigma.min.css";
 import {useGraphStore} from "../stores/graphStore";
 import GraphEvents from "./GraphEvents"
+import drawEdgeLabel from "sigma/rendering/canvas/edge-label";
 
 
 // type PlayerNode = {
@@ -53,9 +54,9 @@ export const LoadGraph = () => {
 
 export const SigmaGraph = () => {
   return (
-    <SigmaContainer style={{ height: "600px", width: "800px" }}>
-      <LoadGraph />
+    <SigmaContainer style={{ height: "600px", width: "800px" }} settings={{renderEdgeLabels: true,edgeLabelSize :10, defaultEdgeType : 'arrow' }} >
       <GraphEvents />
+      <LoadGraph />
     </SigmaContainer>
   );
 };
