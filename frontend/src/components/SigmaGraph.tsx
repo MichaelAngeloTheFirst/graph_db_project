@@ -6,7 +6,7 @@ import {
 import "@react-sigma/core/lib/react-sigma.min.css";
 import {useGraphStore} from "../stores/graphStore";
 import GraphEvents from "./GraphEvents"
-import drawEdgeLabel from "sigma/rendering/canvas/edge-label";
+
 
 
 // type PlayerNode = {

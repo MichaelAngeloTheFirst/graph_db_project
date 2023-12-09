@@ -22,6 +22,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import {useGraphStore} from "@/stores/graphStore"
 import axios from "axios"
+import { env } from "@/env"
 
 
 const formSchema = z.object({
@@ -46,7 +47,7 @@ export default function AddGameDialog() {
   })
  
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const response = axios.post("http://localhost:8000/add_game/", values)
+    const response = axios.post(`${env.PUBLIC_API_URL}/add_game/`, values)
     console.log(response)
     fetchGraph();
     console.log(values)

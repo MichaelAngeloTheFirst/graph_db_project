@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import Graph from "graphology";
 import axios from "axios";
+import { env } from "@/env";
 
 type PlayerNode = {
   Number: number;
@@ -29,42 +30,42 @@ type GraphStore = {
 };
 
 const fetchPlayer = async () => {
-  const response = await axios.get("http://localhost:8000/player/");
+  const response = await axios.get(`${env.PUBLIC_API_URL}/player/`);
   return response.data;
 };
 
 const fetchTeam = async () => {
-  const response = await axios.get("http://localhost:8000/team/");
+  const response = await axios.get(`${env.PUBLIC_API_URL}/team/`);
   return response.data;
 };
 
 const fetchArena = async () => {
-  const response = await axios.get("http://localhost:8000/arena/");
+  const response = await axios.get(`${env.PUBLIC_API_URL}/arena/`);
   return response.data;
 };
 
 const fetchGame = async () => {
-  const response = await axios.get("http://localhost:8000/game/");
+  const response = await axios.get(`${env.PUBLIC_API_URL}/game/`);
   return response.data;
 };
 
 const fetchPlayerTeam = async () => {
-  const response = await axios.get("http://localhost:8000/player_team/");
+  const response = await axios.get(`${env.PUBLIC_API_URL}/player_team/`);
   return response.data;
 };
 
 const fetchGameArena = async () => {
-  const response = await axios.get("http://localhost:8000/game_arena/");
+  const response = await axios.get(`${env.PUBLIC_API_URL}/game_arena/`);
   return response.data;
 };
 
 const fetchArenaTeam = async () => {
-  const response = await axios.get("http://localhost:8000/arena_team/");
+  const response = await axios.get(`${env.PUBLIC_API_URL}/arena_team/`);
   return response.data;
 };
 
 const fetchTeamGame = async () => {
-  const response = await axios.get("http://localhost:8000/team_game/");
+  const response = await axios.get(`${env.PUBLIC_API_URL}/team_game/`);
   return response.data;
 };
 

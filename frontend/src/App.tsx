@@ -34,7 +34,7 @@ const drawLine = (ctx: CanvasRenderingContext2D, canvas: { width: number; height
 
 
 function App() {
-  const [visible, setVisible] = useState(true);
+  // const [visible, setVisible] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [startPoint, setStartPoint] = useState<Point | null>(null);
   // const [endPoint, setEndPoint] = useState<Point | null>(null);
@@ -52,19 +52,17 @@ function App() {
     const clickedPoint: Point = { x, y };
 
     if (!startPoint) {
-      // Set the starting point on the first click
       setStartPoint(clickedPoint);
       setIsDrawing(true);
     } else {
-      // Set the ending point continuously as the cursor moves
-      // setEndPoint(clickedPoint);
+
       setIsDrawing(false);
 
       setStartPoint(null);
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // setEndPoint(null);
+
     }
 
   };
@@ -81,10 +79,6 @@ function App() {
     const currentPoint: Point = { x, y };
 
     if (isDrawing) {
-      // Set the ending point continuously as the cursor moves after the first click
-      // setEndPoint(currentPoint);
-
-      // Draw the line dynamically
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       drawLine(ctx, canvas, startPoint!, isDrawing, currentPoint);
