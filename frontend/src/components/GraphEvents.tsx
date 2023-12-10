@@ -5,17 +5,15 @@ import {useGraphStore} from "@/stores/graphStore";
 import { SigmaEdgeEventPayload, SigmaNodeEventPayload } from "sigma/sigma";
 import { env } from "@/env";
 
-function splitStringOnFirstSpace(inputString: string): [string, string] {
-    const index = inputString.indexOf(' ');
+function splitStringOnKey(inputString: string): [string, string] {
+    const index = inputString.indexOf('@@');
     
     if (index !== -1) {
         const firstPart = inputString.slice(0, index);
-        const secondPart = inputString.slice(index + 1);
+        const secondPart = inputString.slice(index + 2);
 
         return [firstPart, secondPart];
     } else {
-        // If there is no space in the string, return the whole string as the first part,
-        // and an empty string as the second part.
         return [inputString, ''];
     }
 }
@@ -33,8 +31,8 @@ export default function GraphEvents() {
     },[fetchGraph])   
 
     const deleteEdge = useCallback(async (event: SigmaEdgeEventPayload) => {
-        console.log(splitStringOnFirstSpace(event.edge));
-        const [node1, node2] = splitStringOnFirstSpace(event.edge);
+        console.log(splitStringOnKey(event.edge));
+        const [node1, node2] = splitStringOnKey(event.edge);
         const nodeType1 = graph.getNodeAttributes(node1).nodeType;
         const nodeType2 = graph.getNodeAttributes(node2).nodeType;
         if(nodeType1 === 'Player' && nodeType2 === 'Team'  ) {
@@ -142,8 +140,11 @@ export default function GraphEvents() {
                 addEdge(event)
             },
             rightClickEdge: (event) => {
+                console.log("rightClickEdge", event.edge)
                 deleteEdge(event)
             },
+            clickEdge: (event) => console.log(" left click Edge", splitStringOnKey(event.edge)),
+        
         })
 
     

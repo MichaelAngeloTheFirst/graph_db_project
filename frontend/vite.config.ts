@@ -11,4 +11,5 @@ export default defineConfig({
     },
   },
   envPrefix: "PUBLIC_",
+  base: "/graph_db_project/"
 })

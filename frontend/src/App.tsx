@@ -1,9 +1,9 @@
 import { useState, useRef } from "react";
 import "./App.css";
-// import Canvas from './components/Canvas'
+
 import { SigmaGraph } from "./components/SigmaGraph";
 import GlobalGraph from "./components/GlobalGraph";
-// import {ContextMenu} from "./components/ContextMenu";
+
 import AddPlayerDialog from "./components/AddPlayerDialog"; 
 import AddTeamDialog from "./components/AddTeamDialog";
 import AddArenaDialog from "./components/AddArenaDialog";
@@ -14,15 +14,9 @@ interface Point {
 }
 
 const drawLine = (ctx: CanvasRenderingContext2D, canvas: { width: number; height: number; }, startPoint : Point, isDrawing :boolean, endPoint : Point ) => {
-  // const canvas = canvasRef.current;
-  // if (!canvas) return;
-
-  // const ctx = canvas.getContext("2d");
-  // if (!ctx) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.strokeStyle = "hotpink";
-  // Draw the line
   if (startPoint && isDrawing && endPoint) {
     ctx.beginPath();
     ctx.moveTo(startPoint.x, startPoint.y);
@@ -34,18 +28,15 @@ const drawLine = (ctx: CanvasRenderingContext2D, canvas: { width: number; height
 
 
 function App() {
-  // const [visible, setVisible] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [startPoint, setStartPoint] = useState<Point | null>(null);
-  // const [endPoint, setEndPoint] = useState<Point | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
   const handleCanvasClick = (
-    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    console.log("click");
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -68,7 +59,7 @@ function App() {
   };
 
   const handleMouseMove = (
-    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -113,7 +104,6 @@ function App() {
                 <SigmaGraph />
               </GlobalGraph>
             </div>
-            {visible && (
               <div className="absolute  pointer-events-none ">
                 <canvas
                   className="border-4 border-red-900  "
@@ -122,7 +112,6 @@ function App() {
                   height={600}
                 ></canvas>
               </div>
-            )}
           </div>
         </div>
       

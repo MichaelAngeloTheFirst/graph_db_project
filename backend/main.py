@@ -46,7 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-load_dotenv("db_connection.txt")
+load_dotenv()
 
 URI = os.getenv("NEO4J_URI")
 AUTH = (os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD"))
@@ -185,45 +185,46 @@ async def add_edge_gamearena(edge: Edge, driver: Annotated[Driver, Depends(get_d
         { "firstnode": edge.firstnode,  "secondnode": edge.secondnode},
     )
 
- 
+
 @app.post("/add_edge_arenateam/")
 async def add_edge_arenateam(edge: Edge, driver: Annotated[Driver, Depends(get_driver)]):
     driver.execute_query(
         "MATCH (p), (t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) CREATE (p)-[r:BELONGS_TO]->(t);",
         { "firstnode": edge.firstnode,  "secondnode": edge.secondnode},
     )
-    
+
+
 @app.delete("/edge_playerteam/{firstnode}/{secondnode}")
 async def delete_edge_playerteam(firstnode: str, secondnode: str, driver: Annotated[Driver, Depends(get_driver)]):
     driver.execute_query(
         "MATCH (p)-[r:PLAYS_IN]->(t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) DELETE r;",
         { "firstnode": firstnode,  "secondnode": secondnode},
     )
-    
+
+
 @app.delete("/edge_teamgame/{firstnode}/{secondnode}")
 async def delete_edge_teamgame(firstnode: str, secondnode: str, driver: Annotated[Driver, Depends(get_driver)]):
     driver.execute_query(
         "MATCH (p)-[r:TOOK_PART_IN]->(t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) DELETE r;",
         { "firstnode": firstnode,  "secondnode": secondnode},
     )
-    
+
+
 @app.delete("/edge_gamearena/{firstnode}/{secondnode}")
 async def delete_edge_gamearena(firstnode: str, secondnode: str, driver: Annotated[Driver, Depends(get_driver)]):
     driver.execute_query(
         "MATCH (p)-[r:TOOK_PLACE_AT]->(t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) DELETE r;",
         { "firstnode": firstnode,  "secondnode": secondnode},
     )
-    
+
+
 @app.delete("/edge_arenateam/{firstnode}/{secondnode}")
 async def delete_edge_arenateam(firstnode: str, secondnode: str, driver: Annotated[Driver, Depends(get_driver)]):
     driver.execute_query(
         "MATCH (p)-[r:BELONGS_TO]->(t) WHERE ANY(key IN keys(p) WHERE p[key] =$firstnode)  AND ANY(key IN keys(t) WHERE t[key] = $secondnode) DELETE r;",
         { "firstnode": firstnode,  "secondnode": secondnode},
     )
-    
 
-# MATCH (n:Person {name: 'Laurence Fishburne'})-[r:ACTED_IN]->()
-# DELETE r
 
 @app.delete("/node/{node_name}")
 async def delete_node(node_name: str, driver: Annotated[Driver, Depends(get_driver)]):
